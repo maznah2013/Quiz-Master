@@ -65,8 +65,53 @@ def draw():
     screen.draw.textbox("hello world!", question_box, color="purple", shadow=(0.5,0.5), scolor="grey")
 
 
-
 def update():
-    pass
+    move_marquee()
+
+def move_marquee():
+    marquee_box.x=marquee_box.x - 2
+    if marquee_box.right<0:
+        marquee_box.left=WIDTH
+    
+def read_question_file():
+    global questions, question_count
+    q_file=open(question_file, "r")
+    for question in question_file:
+        questions.append(question)
+        question_count=question_count + 1
+    q_file.close()
+    
+def read_next_question():
+    global question_index
+    question_index=question_index + 1
+    return questions.pop(0).split(",")
+
+def on_mouse_down(pos):
+    index=1
+    for box in answer_boxes:
+        if box.collidepoint(pos):
+            if index is int(question[5]):
+                correct_answer()
+            else:
+                game_over()
+
+        index=index + 1
+    
+    if skip_box.collidepoint(pos):
+        skip_question()
+
+def correct_answer():
+    global score, question, time_left, questions
+    score=score + 1
+    if questions:
+        question=read_next_question()
+        time_left=10
+    else:
+        game_over()
+        
+    
+
+read_question_file()
+question=read_next_question()
 
 pgzrun.go()
