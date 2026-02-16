@@ -62,7 +62,12 @@ def draw():
     
     screen.draw.textbox(f"Score:{score}", score_box, color="#854D27")
 
-    screen.draw.textbox("hello world!", question_box, color="purple", shadow=(0.5,0.5), scolor="grey")
+    screen.draw.textbox(question[0].strip(), question_box, color="purple", shadow=(0.5,0.5), scolor="grey")
+
+    index=1
+    for answer_box in answer_boxes:
+        screen.draw.textbox(question[index].strip(), answer_box, color="white")
+        index=index+1
 
 
 def update():
@@ -76,7 +81,7 @@ def move_marquee():
 def read_question_file():
     global questions, question_count
     q_file=open(question_file, "r")
-    for question in question_file:
+    for question in q_file:
         questions.append(question)
         question_count=question_count + 1
     q_file.close()
@@ -108,10 +113,31 @@ def correct_answer():
         time_left=10
     else:
         game_over()
-        
-    
+
+def game_over():
+    global question, time_left, is_game_over
+    message=f"Game over! You got {score} questions right!"
+    question=[message, "-", "-", "-", "-", 5]
+    time_left=0
+    is_game_over=True
+
+def skip_question():
+    global question, time_left
+    if questions and not is_game_over:
+        question=read_next_question()
+        time_left=10
+    else:
+        game_over()
+
+def update_time():
+    global time_left
+    if time_left:
+        time_left=time_left-1
+    else:
+        game_over()
 
 read_question_file()
 question=read_next_question()
+clock.schedule_interval(update_time, 1)
 
 pgzrun.go()
